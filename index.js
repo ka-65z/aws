@@ -102,6 +102,29 @@ app.post("/profile", function (req, res, next) {
   res.json(req.body);
 });
 
+//バケット名を取得する
+app.get(/bucket", () async function (req,res,next) {
+        const command = new ListBucketsCommand({});
+try {
+    const { Owner, Buckets } = await client.send(command);
+    console.log(
+      `${Owner.DisplayName} owns ${Buckets.length} bucket${
+        Buckets.length === 1 ? "" : "s"
+      }:`,
+    );
+    console.log(`${Buckets.map((b) => ` • ${b.Name}`).join("\n")}`);
+    //ブラウザーにバケット名を返送するためBecketsからbucket.nameを抽出して
+    //bucketNameListに格納し、JSON・文字列指定でsendする
+    //map(bucket => bucket.Name)logへの書き出しとは少し違う（この違いが？？）
+    let bucketNameList = Buckets.map(bucket => bucket.Name)
+    res.send(JSON.stringify(bucketNameList));
+    //以降はエラー処理
+  } catch (err) {
+    console.error(err);
+    res.send(`ERROR: ${err}`);
+  }
+});
+
 app.listen(port, () => {
   console.log(`サンプルアプリを起動します`);
 });
